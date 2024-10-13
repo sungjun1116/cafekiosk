@@ -41,7 +41,7 @@ public class Order extends BaseEntity {
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
     public static Order create(List<Product> products, LocalDateTime registeredDateTime) {
-        return new Order(products, registeredDateTime);
+         return new Order(products, registeredDateTime);
     }
 
     public Order(List<Product> products, LocalDateTime registeredDateTime) {
