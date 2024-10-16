@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sample.cafekiosk.spring.domain.BaseEntity;
@@ -40,17 +41,22 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
-    public static Order create(List<Product> products, LocalDateTime registeredDateTime) {
-         return new Order(products, registeredDateTime);
-    }
-
-    public Order(List<Product> products, LocalDateTime registeredDateTime) {
-        this.orderStatus = OrderStatus.INIT;
+    @Builder
+    private Order(OrderStatus orderStatus, List<Product> products, LocalDateTime registeredDateTime) {
+        this.orderStatus = orderStatus;
         this.totalPrice = calculateTotalPrice(products);
         this.registeredDateTime = registeredDateTime;
         this.orderProducts = products.stream()
                 .map(product -> new OrderProduct(this, product))
                 .collect(Collectors.toList());
+    }
+
+    public static Order create(List<Product> products, LocalDateTime registeredDateTime) {
+        return Order.builder()
+            .orderStatus(OrderStatus.INIT)
+            .products(products)
+            .registeredDateTime(registeredDateTime)
+            .build();
     }
 
     private int calculateTotalPrice(List<Product> products) {
