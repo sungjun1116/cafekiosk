@@ -161,12 +161,13 @@ class OrderServiceTest {
         Product product3 = createProduct(HANDMADE, "003", 5000);
         productRepository.saveAll(List.of(product1, product2, product3));
 
-        Stock stock1 = Stock.create("001", 2);
-        Stock stock2 = Stock.create("002", 1);
-        stock1.deductQuantity(1); // TODO
+        Stock stock1 = createStock("001", 1);
+        Stock stock2 = createStock("002", 1);
         stockRepository.saveAll(List.of(stock1, stock2));
 
-        OrderCreateServiceRequest request = new OrderCreateServiceRequest(List.of("001", "001", "002", "003"));
+        OrderCreateServiceRequest request = OrderCreateServiceRequest.builder()
+            .productNumbers(List.of("001", "001", "002", "003"))
+            .build();
 
         // when && then
         assertThatThrownBy(() -> orderService.createOrder(request, registeredDateTime))
@@ -184,4 +185,10 @@ class OrderServiceTest {
                 .build();
     }
 
+    private Stock createStock(String productNumber, int quantity) {
+        return Stock.builder()
+            .productNumber(productNumber)
+            .quantity(quantity)
+            .build();
+    }
 }
