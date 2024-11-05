@@ -23,31 +23,19 @@ import java.util.List;
 @Service
 public class ProductService {
 
+    private final ProductNumberFactory productNumberFactory;
     private final ProductRepository productRepository;
 
     // 동시성 이슈
     // UUID
     @Transactional
     public ProductResponse createProduct(ProductCreateServiceRequest request) {
-        String nextProductNumber = createNextProductNumber();
+        String nextProductNumber = productNumberFactory.createNextProductNumber();
 
         Product product = request.toEntity(nextProductNumber);
         Product savedProduct = productRepository.save(product);
 
         return ProductResponse.of(savedProduct);
-    }
-
-    private String createNextProductNumber() {
-        String latestProductNumber = productRepository.findLatestProductNumber();
-        if (latestProductNumber == null) {
-            return "001";
-        }
-
-        int latestProductNumberInt = Integer.parseInt(latestProductNumber);
-        int nextProductNumberInt = latestProductNumberInt + 1;
-
-        // 9 -> 009, 10 -> 010
-        return String.format("%03d", nextProductNumberInt);
     }
 
     public List<ProductResponse> getSellingProducts() {
